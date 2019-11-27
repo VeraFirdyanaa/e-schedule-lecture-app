@@ -17,7 +17,10 @@ class Login extends Component {
         const { email, password } = this.state;
         this.props.dispatch(
             doLogin({ email, password },
-                (response) => {
+                async (response) => {
+                    console.log('response');
+                    await AsyncStorage.setItem('token', response.token);
+                    await AsyncStorage.setItem('userData', JSON.stringify(response.user));
                     this.props.navigation.navigate('App');
                 },
                 (err) => {

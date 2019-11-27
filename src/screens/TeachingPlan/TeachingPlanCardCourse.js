@@ -36,59 +36,128 @@ const TeachingPlanCardCourse = props => (
         <Item fixedLabel>
           <Input placeholder={"Cari Mata Kuliah"} />
         </Item>
-        <Item fixedLabel style={{ marginVertical: 10 }}>
-          <Item picker>
-            <Picker
-              mode="dropdown"
-              iosIcon={<Icon name="arrow-down" />}
-              style={{ width: undefined }}
-              placeholder="Pilih Tipe Kelas"
-              placeholderStyle={{ color: "#bfc6ea" }}
-              placeholderIconColor="#007aff"
-              selectedValue={props.selected2}
-              onValueChange={props.handleTipeKelas}
-            >
-              <Picker.Item label="Reguler Pagi" value="key0" />
-              <Picker.Item label="Malam" value="key1" />
-              <Picker.Item label="Ekstension" value="key1" />
-            </Picker>
+        <View>
+          <View style={{ marginLeft: 15, marginTop: 35 }}>
+            <Text style={{ fontSize: 20, fontStyle: 'italic' }}>Kelas Reguler Pagi</Text>
+          </View>
+          <Item fixedLabel style={{ marginVertical: 10 }}>
+            <Item picker>
+              <Picker
+                mode="dropdown"
+                iosIcon={<Icon name="arrow-down" />}
+                style={{ width: undefined }}
+                placeholder="Pilih Hari"
+                placeholderStyle={{ color: "#bfc6ea" }}
+                placeholderIconColor="#007aff"
+                selectedValue={props.selected2}
+                onValueChange={props.handleDay}
+              >
+                {
+                  days.map(day => <Picker.Item key={day.value} label={day.value} value={day.key} />)
+                }
+              </Picker>
+            </Item>
           </Item>
-        </Item>
-        <Item fixedLabel style={{ marginVertical: 10 }}>
-          <Item picker>
-            <Picker
-              mode="dropdown"
-              iosIcon={<Icon name="arrow-down" />}
-              style={{ width: undefined }}
-              placeholder="Pilih Hari"
-              placeholderStyle={{ color: "#bfc6ea" }}
-              placeholderIconColor="#007aff"
-              selectedValue={props.selected2}
-              onValueChange={props.handleDay}
-            >
-              {
-                days.map(day => <Picker.Item key={day.value} label={day.value} value={day.key} />)
-              }
-            </Picker>
-          </Item>
-        </Item>
-        <View style={{ marginTop: 10 }}>
-          {props.date ? (
-            <Text style={{ marginLeft: 15, fontSize: 16 }}>Waktu Mengajar : {moment(new Date(props.date)).format("HH:mm")}</Text>
-          ) : null}
-          <Button onPress={props.timepicker} transparent>
-            <Text>Pilih Waktu Mengajar</Text>
-          </Button>
+          <View style={{ marginTop: 10 }}>
+            {props.date ? (
+              <Text style={{ marginLeft: 15, fontSize: 16 }}>Waktu Mengajar : {moment(new Date(props.date)).format("HH:mm")}</Text>
+            ) : null}
+            <Button onPress={props.timepicker} transparent>
+              <Text>Pilih Waktu Mengajar</Text>
+            </Button>
+          </View>
+          {
+            props.showtimePicker ? (
+              <DateTimePicker value={props.date}
+                mode={'time'}
+                is24Hour={true}
+                display="default"
+                onChange={props.setDate} />
+            ) : null
+          }
         </View>
-        {
-          props.showtimePicker ? (
-            <DateTimePicker value={props.date}
-              mode={'time'}
-              is24Hour={true}
-              display="default"
-              onChange={props.setDate} />
-          ) : null
-        }
+
+        <View>
+          <View style={{ marginLeft: 15, marginTop: 35 }}>
+            <Text style={{ fontSize: 20, fontStyle: 'italic' }}>Kelas Reguler Malam</Text>
+          </View>
+          <Item fixedLabel style={{ marginVertical: 10 }}>
+            <Item picker>
+              <Picker
+                mode="dropdown"
+                iosIcon={<Icon name="arrow-down" />}
+                style={{ width: undefined }}
+                placeholder="Pilih Hari"
+                placeholderStyle={{ color: "#bfc6ea" }}
+                placeholderIconColor="#007aff"
+                selectedValue={props.selected2}
+                onValueChange={props.handleDay}
+              >
+                {
+                  days.map(day => <Picker.Item key={day.value} label={day.value} value={day.key} />)
+                }
+              </Picker>
+            </Item>
+          </Item>
+          <View style={{ marginTop: 10 }}>
+            {props.date ? (
+              <Text style={{ marginLeft: 15, fontSize: 16 }}>Waktu Mengajar : {moment(new Date(props.date)).format("HH:mm")}</Text>
+            ) : null}
+            <Button onPress={props.timepicker} transparent>
+              <Text>Pilih Waktu Mengajar</Text>
+            </Button>
+          </View>
+          {
+            props.showtimePicker ? (
+              <DateTimePicker value={props.date}
+                mode={'time'}
+                is24Hour={true}
+                display="default"
+                onChange={props.setDate} />
+            ) : null
+          }
+        </View>
+
+        <View>
+          <View style={{ marginLeft: 15, marginTop: 35 }}>
+            <Text style={{ fontSize: 20, fontStyle: 'italic' }}>Kelas Khusus/Ekstension</Text>
+          </View>
+          <Item fixedLabel style={{ marginVertical: 10 }}>
+            <Item picker>
+              <Picker
+                mode="dropdown"
+                iosIcon={<Icon name="arrow-down" />}
+                style={{ width: undefined }}
+                placeholder="Pilih Hari"
+                placeholderStyle={{ color: "#bfc6ea" }}
+                placeholderIconColor="#007aff"
+                selectedValue={props.selected2}
+                onValueChange={props.handleDay}
+              >
+                {
+                  days.map(day => <Picker.Item key={day.value} label={day.value} value={day.key} />)
+                }
+              </Picker>
+            </Item>
+          </Item>
+          <View style={{ marginTop: 10 }}>
+            {props.date ? (
+              <Text style={{ marginLeft: 15, fontSize: 16 }}>Waktu Mengajar : {moment(new Date(props.date)).format("HH:mm")}</Text>
+            ) : null}
+            <Button onPress={props.timepicker} transparent>
+              <Text>Pilih Waktu Mengajar</Text>
+            </Button>
+          </View>
+          {
+            props.showtimePicker ? (
+              <DateTimePicker value={props.date}
+                mode={'time'}
+                is24Hour={true}
+                display="default"
+                onChange={props.setDate} />
+            ) : null
+          }
+        </View>
       </Form>
     </CardItem>
   </Card>

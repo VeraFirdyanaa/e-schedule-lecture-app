@@ -9,8 +9,8 @@ function* doLogin(payload) {
         const response = yield call(postLogin, payload.user);
         yield put({ type: LOADING_LOGIN, isLoading: false });
         if (response && response.data && response.data.token) {
-            yield call(AsyncStorage.setItem, 'token', JSON.stringify(response.data.token));
-            yield call(AsyncStorage.setItem, 'userData', JSON.stringify(response.data.user));
+            // yield call(AsyncStorage.setItem, 'token', response.data.token);
+            // yield call(AsyncStorage.setItem, 'userData', JSON.stringify(response.data.user));
             payload.onSuccess(response.data);
             yield put({ type: LOGIN_SUCCESS, data: response.data });
         } else {

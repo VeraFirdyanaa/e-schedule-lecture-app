@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, AsyncStorage } from "react-native";
 import { Header, Body, Title, Button, Icon } from "native-base";
 import colors from '../../colors';
 import TeachingPlanCardCourse from './TeachingPlanCardCourse';
+import { connect } from "react-redux";
+import { START_GET_MY_COURSE } from '../../redux/reducers/coursesReducer';
 
 class TeachingPlanForm extends Component {
 
@@ -12,19 +14,24 @@ class TeachingPlanForm extends Component {
     plans: [],
     date: new Date(),
     showTimePicker: false,
+    sksKuota: 12
   }
 
-  componentDidMount() {
-    if (this.state.plans.length === 0) {
-      let plans = [...this.state.plans];
-      plans.push({
-        course_id: null,
-        day: '',
-        timeType: '',
-        time: null
-      });
-      this.setState({ plans });
-    }
+  async componentDidMount() {
+    // if (this.state.plans.length === 0) {
+    //   let plans = [...this.state.plans];
+    //   plans.push({
+    //     course_id: null,
+    //     day: '',
+    //     timeType: '',
+    //     time: null
+    //   });
+    //   this.setState({ plans });
+    // }
+    let token = await AsyncStorage.getItem('token');
+    console.log('token', token);
+    this.props.getMyCourses(token);
+    console.log('my courses', this.props.courses);
   }
 
   addNewCourse = e => {
@@ -78,8 +85,9 @@ class TeachingPlanForm extends Component {
             </Body>
           </Header>
           <View style={{ flex: 1, marginHorizontal: 10, marginBottom: 60 }}>
-            {this.state.plans.map((plan, index) => (
+            {!this.props.loadingCourse ? this.state.plans.map((plan, index) => (
               <TeachingPlanCardCourse key={index}
+                sksKuota={this.state.sksKuota}
                 timepicker={this.showPicker}
                 showtimePicker={this.state.showTimePicker}
                 date={this.state.date}
@@ -90,7 +98,7 @@ class TeachingPlanForm extends Component {
                 remove={() => this.removePlan(index)}
                 no={index + 1}
                 index={index} />
-            ))}
+            )) : <ActivityIndicator size="large" color={colors.green01} />}
           </View>
         </ScrollView>
         {
@@ -115,4 +123,14 @@ class TeachingPlanForm extends Component {
   }
 }
 
-export default TeachingPlanForm;
+const mapStateToProps = ({ course }) => ({
+  courses: course.courses,
+  loadingCourse: course.loadingCourse,
+  error: course.error
+});
+
+const mapDispatchToProps = dispatch => ({
+  getMyCourses: token => dispatch({ type: START_GET_MY_COURSE, token: token })
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(TeachingPlanForm);

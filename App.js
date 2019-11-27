@@ -11,6 +11,7 @@ import { View } from 'react-native';
 import { Provider } from "react-redux";
 import FlashMessage from "react-native-flash-message";
 import { createBottomTabNavigator, createStackNavigator, createSwitchNavigator, createAppContainer } from "react-navigation";
+import OneSignal from "react-native-onesignal";
 
 import store from "./src/redux/store";
 import { Icon } from "native-base";
@@ -133,6 +134,37 @@ const SwitchNavigator = createSwitchNavigator({
 const AppContainer = createAppContainer(SwitchNavigator);
 
 export default class App extends Component {
+
+  constructor() {
+    super();
+    OneSignal.init("a9bc198a-a2cb-4eb8-91e9-07751b4da2fe");
+
+    OneSignal.addEventListener('received', this.onReceived);
+    OneSignal.addEventListener('opened', this.onOpened);
+    OneSignal.addEventListener('ids', this.onIds);
+  }
+
+  componentWillUnmount() {
+    OneSignal.removeEventListener('received', this.onReceived);
+    OneSignal.removeEventListener('opened', this.onOpened);
+    OneSignal.removeEventListener('ids', this.onIds);
+  }
+
+  onReceived(notification) {
+    console.log("Notification received: ", notification);
+  }
+
+  onOpened(openResult) {
+    console.log('Message: ', openResult.notification.payload.body);
+    console.log('Data: ', openResult.notification.payload.additionalData);
+    console.log('isActive: ', openResult.notification.isAppInFocus);
+    console.log('openResult: ', openResult);
+  }
+
+  onIds(device) {
+    console.log('Device info: ', device);
+  }
+
   render() {
     return (
       <Provider store={store}>
