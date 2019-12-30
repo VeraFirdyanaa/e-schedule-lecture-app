@@ -5,6 +5,7 @@ import colors from '../../colors';
 import TeachingPlanCardCourse from './TeachingPlanCardCourse';
 import { connect } from "react-redux";
 import { START_GET_MY_COURSE } from '../../redux/reducers/coursesReducer';
+import { showMessage } from "react-native-flash-message";
 
 class TeachingPlanForm extends Component {
 
@@ -18,19 +19,29 @@ class TeachingPlanForm extends Component {
   }
 
   async componentDidMount() {
-    // if (this.state.plans.length === 0) {
-    //   let plans = [...this.state.plans];
-    //   plans.push({
-    //     course_id: null,
-    //     day: '',
-    //     timeType: '',
-    //     time: null
-    //   });
-    //   this.setState({ plans });
-    // }
     let token = await AsyncStorage.getItem('token');
     console.log('token', token);
     this.props.getMyCourses(token);
+    this.state.plans = this.props.courses ? this.props.courses.map(course => {
+      return {
+        ...course,
+        name: course.name,
+        fieldName: course.code,
+        showRegulerTimePicker: false,
+        showNightTimePicker: false,
+        showExtensionTimePicker: false,
+        // classRegulerSelected: '',
+        dayReguler: '',
+        dateReguler: new Date(),
+        // classNightSelected: '',
+        dayNight: '',
+        dateNight: new Date(),
+        // classExtensionSelected: '',
+        dayExtension: '',
+        dateExtension: new Date(),
+        taken: false
+      }
+    }) : [];
     console.log('my courses', this.props.courses);
   }
 
@@ -51,19 +62,60 @@ class TeachingPlanForm extends Component {
     this.setState({ plans });
   }
 
-  setDate = (event, date) => {
-    date = date || this.state.date;
-
+  setDate = (event, date, index, key, keyTimePicker) => {
+    console.log('event setDate', event, date, index);
+    date = date || new Date();
+    let plans = [...this.state.plans];
+    plans[index][keyTimePicker] = Platform.OS === 'ios' ? true : false;
+    plans[index][key] = date
     this.setState({
-      showTimePicker: Platform.OS === 'ios' ? true : false,
-      date,
+      plans
     });
   }
 
-  showPicker = () => {
+  showPicker = (index, key) => {
+    let plans = [...this.state.plans];
+    plans[index][key] = true;
     this.setState({
-      showTimePicker: true
+      plans: plans
     })
+  }
+
+  handleTipeKelas = (e, index, key) => {
+    let plans = [...this.state.plans];
+    plans[index][key] = e;
+    console.log('plans', plans);
+    this.setState({
+      plans
+    })
+  }
+
+  handleDay = (e, index, key) => {
+    let plans = [...this.state.plans];
+    plans[index][key] = e;
+    this.setState({
+      plans
+    })
+  }
+
+  takingCourse = index => {
+    let plans = [...this.state.plans];
+    if (this.state.sksKuota < plans[index].sks) {
+      showMessage({
+        message: "Oops..!",
+        description: 'Kamu telah melebihi Batas Kuota Mengajar (Maks: 12 SKS)',
+        type: "warning",
+        icon: "warning",
+        duration: 3000
+      });
+      return
+    }
+
+    plans[index].taken = !plans[index].taken;
+    this.setState(prevState => ({
+      plans,
+      sksKuota: plans[index].taken === true ? prevState.sksKuota - plans[index].sks : prevState.sksKuota + plans[index].sks
+    }))
   }
 
   render() {
@@ -87,21 +139,41 @@ class TeachingPlanForm extends Component {
           <View style={{ flex: 1, marginHorizontal: 10, marginBottom: 60 }}>
             {!this.props.loadingCourse ? this.state.plans.map((plan, index) => (
               <TeachingPlanCardCourse key={index}
+                course={plan}
                 sksKuota={this.state.sksKuota}
-                timepicker={this.showPicker}
-                showtimePicker={this.state.showTimePicker}
-                date={this.state.date}
-                setDate={this.setDate}
-                selected2={this.state.selected2}
-                handleTipeKelas={e => this.setState({ selected2: e })}
-                handleDay={e => this.setState({ day: e })}
+                RegulerTimepicker={() => this.showPicker(index, 'showRegulerTimePicker')}
+                NightTimepicker={() => this.showPicker(index, 'showNightTimePicker')}
+                ExtensionTimepicker={() => this.showPicker(index, 'showExtensionTimePicker')}
+                showRegulerTimepicker={plan.showRegulerTimePicker}
+                showNightTimepicker={plan.showNightTimePicker}
+                showExtensionTimepicker={plan.showExtensionTimePicker}
+                dateReguler={plan.dateReguler}
+                dateNight={plan.dateNight}
+                dateExtension={plan.dateExtension}
+                setDateReguler={(e, date) => this.setDate(e, date, index, 'dateReguler', 'showRegulerTimePicker')}
+                setDateNight={(e, date) => this.setDate(e, date, index, 'dateNight', 'showNightTimePicker')}
+                setDateExtension={(e, date) => this.setDate(e, date, index, 'dateExtension', 'showExtensionTimePicker')}
+                dayReguler={plan.dayReguler}
+                dayNight={plan.dayNight}
+                dayExtension={plan.dayExtension}
+                handleDayReguler={(e) => this.handleDay(e, index, 'dayReguler')}
+                handleDayNight={(e) => this.handleDay(e, index, 'dayNight')}
+                handleDayExtension={(e) => this.handleDay(e, index, 'dayExtension')}
+                taken={plan.taken}
+                takingCourse={() => this.takingCourse(index)}
+                // classRegulerSelected={plan.classRegulerSelected}
+                // classNightSelected={plan.classNightSelected}
+                // classExtensionSelected={plan.classExtensionSelected}
+                // handleTipeKelasReguler={(e) => this.handleTipeKelas(e, index, 'classRegulerSelected')}
+                // handleTipeKelasNight={(e) => this.handleTipeKelas(e, index, 'classNightSelected')}
+                // handleTipeKelasExtension={(e) => this.handleTipeKelas(e, index, 'classExtensionSelected')}
                 remove={() => this.removePlan(index)}
                 no={index + 1}
                 index={index} />
             )) : <ActivityIndicator size="large" color={colors.green01} />}
           </View>
         </ScrollView>
-        {
+        {/* {
           this.state.plans.length < 3 ? (
             <TouchableOpacity style={{
               position: 'absolute',
@@ -117,7 +189,7 @@ class TeachingPlanForm extends Component {
               <Icon name="add" type="Ionicons" style={{ color: colors.white, fontSize: 40 }} />
             </TouchableOpacity>
           ) : null
-        }
+        } */}
       </>
     )
   }
